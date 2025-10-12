@@ -1,4 +1,24 @@
-import {test, expect} from "@playwright/test";
+import {test, expect, Page} from "@playwright/test";
+
+const someName = 'Maryam';
+const someEmail = 'magmag@gm.com';
+const someComment = 'test';
+
+const navigateToForm = async(page: Page) => {
+  await page.getByTestId('accept-cookies').click();
+  await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+}
+
+const fillForm = async(page: Page) => {
+  await page.getByRole('textbox', { name: 'Name (required):' }).fill(someName);
+  await page.getByRole('textbox', { name: 'Email (required):' }).fill(someEmail);
+  await page.getByRole('textbox', { name: 'Comment (required):' }).fill(someComment);
+  await page.getByRole('checkbox', { name: 'I agree to the site\'s Terms' }).check();
+}
+
+const clickOnButton = async(page: Page, buttonName: string) => {
+  await page.getByRole('button', { name: buttonName }).click();
+}
 
 test('Form is submitted with required fields' ,async({page})=>{
     let formSubmitted = false;
@@ -10,16 +30,11 @@ test('Form is submitted with required fields' ,async({page})=>{
 
    await page.goto('http://localhost:5200/');
 
-   await page.getByTestId('accept-cookies').click();
+  await navigateToForm(page);
 
-   await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+   await fillForm(page);
 
-   await page.getByRole('textbox', { name: 'Name (required):' }).fill('Maryam');
-   await page.getByRole('textbox', { name: 'Email (required):' }).fill('magmag@gm.com');
-   await page.getByRole('textbox', { name: 'Comment (required):' }).fill('test');
-   await page.getByRole('checkbox', { name: 'I agree to the site\'s Terms' }).check();
-
-   await page.getByRole('button', { name: 'Submit' }).click();
+   await clickOnButton(page, 'Submit');
 
    await expect(formSubmitted).toBe(true);
 });
@@ -31,17 +46,14 @@ test('Form is submitted with required fields >> form is cleared after confirmati
 
    await page.goto('http://localhost:5200/');
 
-   await page.getByTestId('accept-cookies').click();
+   await navigateToForm(page);
 
-   await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+   await fillForm(page);
+
    const name = page.getByRole('textbox', { name: 'Name (required):' });
 
-   await name.fill('Maryam');
-   await page.getByRole('textbox', { name: 'Email (required):' }).fill('magmag@gm.com');
-   await page.getByRole('textbox', { name: 'Comment (required):' }).fill('test');
-   await page.getByRole('checkbox', { name: 'I agree to the site\'s Terms' }).check();
 
-   await page.getByRole('button', { name: 'Submit' }).click();
+   await clickOnButton(page, 'Submit');
 
    await expect(name).toHaveValue('');
 });
@@ -55,13 +67,12 @@ test('Form is not submitted if the user does not enter the minimal required fiel
 
   await page.goto('http://localhost:5200/');
 
-  await page.getByTestId('accept-cookies').click();
+  await navigateToForm(page);
 
-  await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+  await fillForm(page);
+  await page.getByRole('textbox', { name: 'Email (required):' }).fill('');
 
-  await page.getByRole('textbox', { name: 'Name (required):' }).fill('maryam');
-
-  await page.getByRole('button', { name: 'Submit' }).click();
+  await clickOnButton(page, 'Submit');
 
   await expect(formSubmitted).toBe(false);
 
@@ -85,16 +96,11 @@ test('Form should not be submitted if the user does not confirm the dialog' ,asy
 
  await page.goto('http://localhost:5200/');
 
- await page.getByTestId('accept-cookies').click();
+ await navigateToForm(page);
 
- await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+ await fillForm(page);
 
- await page.getByRole('textbox', { name: 'Name (required):' }).fill('Maryam');
- await page.getByRole('textbox', { name: 'Email (required):' }).fill('magmag@gm.com');
- await page.getByRole('textbox', { name: 'Comment (required):' }).fill('test');
- await page.getByRole('checkbox', { name: 'I agree to the site\'s Terms' }).check();
-
- await page.getByRole('button', { name: 'Submit' }).click();
+ await clickOnButton(page, 'Submit');
 
  await expect(formSubmitted).toBe(false);
 });
@@ -106,21 +112,19 @@ test('Form is completed >> clear button should clear the form' ,async({page})=>{
 
   await page.goto('http://localhost:5200/');
 
-  await page.getByTestId('accept-cookies').click();
-
-  await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+  await navigateToForm(page);
 
   const name = page.getByRole('textbox', { name: 'Name (required):' });
 
-  await name.fill('Maryam');
+  await name.fill(someName);
 
-  await page.getByRole('button', { name: 'Save Progress' }).click();
+  await clickOnButton(page, 'Save Progress');
 
   await page.reload();
 
-  await expect(name).toHaveValue('Maryam');
+  await expect(name).toHaveValue(someName);
 
-  await page.getByRole('button', { name: 'Clear Progress' }).click();
+  await clickOnButton(page, 'Clear Progress');
 
   await expect(name).toHaveValue('');
 });
@@ -133,19 +137,17 @@ test('Form is completed >> Clear button should clear the memory' ,async({page})=
 
   await page.goto('http://localhost:5200/');
 
-  await page.evaluate(() => {
-    localStorage.setItem('name', 'Maryam');
-  });
+  await page.evaluate((name) => {
+    localStorage.setItem('name', name);
+  }, someName);
 
   await page.reload();
 
-  await page.getByTestId('accept-cookies').click();
-
-  await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+  await navigateToForm(page);
 
   const name = page.getByRole('textbox', { name: 'Name (required):' });
 
-  await expect(name).toHaveValue('Maryam');
+  await expect(name).toHaveValue(someName);
 
   await page.getByRole('button', { name: 'Clear Progress' }).click(); 
   
@@ -171,21 +173,19 @@ test('Form is completed >> Clear button should not clear the memory if the user 
 
   await page.goto('http://localhost:5200/');
 
-  await page.getByTestId('accept-cookies').click();
-
-  await page.getByRole('link', { name: 'Go to Feedback Form' }).click();
+  await navigateToForm(page);
 
   const name = page.getByRole('textbox', { name: 'Name (required):' });
 
-  await name.fill('Maryam');
+  await name.fill(someName);
 
-  await page.getByRole('button', { name: 'Save Progress' }).click();
+  await clickOnButton(page, 'Save Progress');
 
   await page.reload();
 
-  await page.getByRole('button', { name: 'Clear Progress' }).click();
+  await clickOnButton(page, 'Clear Progress');
 
-  await expect(name).toHaveValue('Maryam');
+  await expect(name).toHaveValue(someName);
 });
 
 
