@@ -116,9 +116,9 @@ test('Form is completed >> clear button should clear the form' ,async({page})=>{
 
   await page.getByRole('button', { name: 'Save Progress' }).click();
 
-  page.reload();
+  await page.reload();
 
-  expect(name).toHaveValue('Maryam');
+  await expect(name).toHaveValue('Maryam');
 
   await page.getByRole('button', { name: 'Clear Progress' }).click();
 
@@ -127,14 +127,17 @@ test('Form is completed >> clear button should clear the form' ,async({page})=>{
 
 
 test('Form is completed >> Clear button should clear the memory' ,async({page})=>{
-  let formSubmitted = false;
-
   page.on('dialog', dialog => {
-    dialog.dismiss();
-    formSubmitted = false;
+    dialog.accept();
   });
 
   await page.goto('http://localhost:5200/');
+
+  await page.evaluate(() => {
+    localStorage.setItem('name', 'Maryam');
+  });
+
+  await page.reload();
 
   await page.getByTestId('accept-cookies').click();
 
@@ -142,15 +145,15 @@ test('Form is completed >> Clear button should clear the memory' ,async({page})=
 
   const name = page.getByRole('textbox', { name: 'Name (required):' });
 
-  await name.fill('Maryam');
+  await expect(name).toHaveValue('Maryam');
 
-  await page.getByRole('button', { name: 'Save Progress' }).click();
+  await page.getByRole('button', { name: 'Clear Progress' }).click(); 
+  
+  const storageName = await page.evaluate(() => {
+    return localStorage.getItem('name');
+  });
 
-  page.reload();
-
-  const storage = localStorage.getItem('name');
-
-  expect(storage).toBe(null);
+  expect(storageName).toBeNull();
 
   await expect(name).toHaveValue('');
 });
@@ -178,7 +181,7 @@ test('Form is completed >> Clear button should not clear the memory if the user 
 
   await page.getByRole('button', { name: 'Save Progress' }).click();
 
-  page.reload();
+  await page.reload();
 
   await page.getByRole('button', { name: 'Clear Progress' }).click();
 
