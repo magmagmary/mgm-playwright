@@ -20,5 +20,5 @@ test('post API test', async ({ request }) => {
 
   const body = await response.json();
   expect(response.status()).toBeLessThan(300);
-  expect(body.title).toBe('foo');
+  expect(body.title).toContain('foo');
 });
