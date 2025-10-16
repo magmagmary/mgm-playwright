@@ -36,17 +36,33 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: ['**/api/**'],
       use: { ...devices['Desktop Chrome'] },
     },
 
     {
       name: 'firefox',
+      testIgnore: ['**/api/**'],
       use: { ...devices['Desktop Firefox'] },
     },
 
     {
       name: 'webkit',
+      testIgnore: ['**/api/**'],
       use: { ...devices['Desktop Safari'] },
+    },
+
+    //api test
+    {
+      name: 'api',
+      testDir: './tests/api',
+      use: {
+        baseURL: 'https://jsonplaceholder.typicode.com',
+        extraHTTPHeaders: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      },
     },
 
     /* Test against mobile viewports. */
