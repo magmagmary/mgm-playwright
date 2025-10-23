@@ -43,5 +43,11 @@ jobs:
 
       - name: install playwright
         run: cd CoolEvents && npx playwright install --with-deps
+      - name: Start server
+        run: |
+          cd CoolEvents
+          npm start &
+          sleep 3
+          curl -f http://localhost:5200 || exit 1
       - name: Run Tests
         run: cd CoolEvents && npm run test
