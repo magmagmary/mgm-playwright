@@ -40,5 +40,8 @@ jobs:
           cache-dependency-path: "CoolEvents/package-lock.json"
       - name: Install deps
         run: cd CoolEvents && npm ci
+
+      - name: install playwright
+        run: cd CoolEvents && npx playwright install --with-deps
       - name: Run Tests
         run: cd CoolEvents && npm run test
