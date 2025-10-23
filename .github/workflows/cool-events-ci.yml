@@ -20,7 +20,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: "npm"
+          cache-dependency-path: "CoolEvents/package-lock.json"
       - name: Install deps
         run: cd CoolEvents && npm ci
       - name: Run Tests
@@ -35,7 +36,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: "npm"
+          cache-dependency-path: "CoolEvents/package-lock.json"
       - name: Install deps
         run: cd CoolEvents && npm ci
       - name: Run Tests
