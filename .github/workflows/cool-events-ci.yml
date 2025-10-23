@@ -30,6 +30,9 @@ jobs:
   test_e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.52.0-jammy
+      options: --user 1001
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -41,8 +44,8 @@ jobs:
       - name: Install deps
         run: cd CoolEvents && npm ci
 
-      - name: install playwright
-        run: cd CoolEvents && npx playwright install --with-deps
+      # - name: install playwright
+      #   run: cd CoolEvents && npx playwright install --with-deps
       - name: Start server
         run: |
           cd CoolEvents
